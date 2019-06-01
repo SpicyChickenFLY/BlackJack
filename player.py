@@ -25,10 +25,9 @@ class Hand:
         return cards
 
     def check_split_allow(self):
-        if len(self.cards) == 2\
-            and self.cards[0].value == self.cards[1].value:
-            return True
-
+        return len(self.cards) == 2 and \
+            self.cards[0].value == self.cards[1].value
+        
     def calc_total_value(self):
         pass
 
@@ -63,7 +62,9 @@ class Player:
         self.hands[hand_index].add(card)
 
     def drop_hand(self, hand_index):
-        return self.hands[hand_index].drop()
+        cards = self.hands[hand_index].drop()
+        self.hands.pop(hand_index)
+        return cards
 
     def add_bet(self, price):
         if self.chips > price:
@@ -83,11 +84,17 @@ class Player:
     def command_1(self, hand_index):
         add_bet_allow = self.chips > 0
         split_allow = self.hands[hand_index].check_split_allow()
-        command = input(
-            "1.surrender, 2.raise_bet:{0}, 3:split:{1}".format(
-                add_bet_allow, split_allow
+        while True:
+            command = input(
+                "1.Surrender, 2.Raise_bet:{0}, 3:Split:{1}, 4:Pass\n".format(
+                    add_bet_allow, split_allow
+                )
             )
-        )
+            if command == '1' \
+                or (add_bet_allow and command == '2') \
+                or (split_allow and command == '3') \
+                or command == '4':
+                break
         return command
 
     def command_2(self):

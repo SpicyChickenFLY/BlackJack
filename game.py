@@ -16,23 +16,23 @@ def compare_hands(dealer_hand, player_hand):
 def game():
     '''Check all players and dealer are ready'''
     
-    players = [Player(20, 'Alice'), Player(30, 'Bob'),  Player(30, 'charlie')]
+    players = [Player(20, 'Alice'), Player(30, 'Bob'),  Player(30, 'Charlie')]
     dealer = Player(70, 'Chow')
 
     deck = Deck(2)
     deck.show(True)
 
     round_num = 0
-    while True:
+    if True:
         '''New round'''
         round_num += 1
-        print(round_num)
+        print('Round: {0}'.format(round_num))
 
         '''Every player devide their bet'''
         for player_index in range(len(players)):
             players[player_index].add_bet(5)
             print(
-                'Player-{0} bet {1}'.format(
+                'Player-{0} bet {1}\n'.format(
                     players[player_index].name, 
                     players[player_index].bets
                 )
@@ -52,33 +52,35 @@ def game():
         print()
 
         '''Each player make a decision'''
-        for player in players:
+        for player_index in range(len(players)):
             hand_index = 0
-            while hand_index < len(player.hands):
+            while hand_index < len(players[player_index].hands):
                 print('Player-{0}: '.format(players[player_index].name), end='')
-                command = player.command_1(hand_index)
-                if command == 1: # surrender
-                    player.lose()
-                    dropped_hand = player.drop_hand()
+                command = players[player_index].command_1(hand_index)
+                if command == '1': # surrender
+                    players[player_index].lose()
+                    dropped_hand = players[player_index].drop_hand(hand_index)
                     for card in dropped_hand:
                         deck.drop(card)
-                    player_index
-                    print('surrender')
-                elif command == 2: # raise_bet
+                    print('Surrender')
+                elif command == '2': # raise_bet
                     bet = 5
                     players[player_index].add_bet(bet)
-                    print('raise_bet:{0}'.format(bet))
-                elif command == 3: #split
-                    
-                    hand_index -= 1
-                    print('split')
+                    print('Raise_bet:{0}'.format(bet))
+                elif command == '3': # split
+                    card1 = deck.deal(True)
+                    card2 = deck.deal(True)
+                    players[player_index].split_hand(hand_index, card1, card2)
+                    print('Split')
+                elif command == '4': # pass
+                    hand_index += 1
+                    print('Pass')
                 else:
-                    hand_index -= 1
-                hand_index += 1
+                    print('Do it again')
+                
             
         '''Each player make a decision'''
-        for player in players:
-            hand_index = 0
+
 
         '''Dealer make a decision '''
 
