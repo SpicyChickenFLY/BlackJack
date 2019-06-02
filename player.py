@@ -29,7 +29,22 @@ class Hand:
             self.cards[0].value == self.cards[1].value
         
     def calc_total_value(self):
-        pass
+        value = 0
+        ace_num = 0
+        for card in self.cards:
+            if card.value == 1:
+                ace_num += 1
+            elif card.value > 10:
+                value += 10
+            else:
+                value += card.value
+            if value > 21:
+                return -1
+        value += ace_num * 11
+        for _ in range(ace_num):
+            if value > 21:
+                value -= 10
+        return -1 if value > 21 else value
 
     def show_down(self):
         for card in self.cards:
@@ -82,23 +97,38 @@ class Player:
         self.bets = 0
 
     def command_1(self, hand_index):
+        surrender_allow = True
         add_bet_allow = self.chips > 0
         split_allow = self.hands[hand_index].check_split_allow()
+        pass_allow = True
         while True:
             command = input(
-                "1.Surrender, 2.Raise_bet:{0}, 3:Split:{1}, 4:Pass\n".format(
-                    add_bet_allow, split_allow
+                "1.Surrender:{0}, 2.Raise_bet:{1}, 3:Split:{2}, 4:Pass:{3}\n".format(
+                    surrender_allow, add_bet_allow, split_allow, pass_allow
                 )
             )
-            if command == '1' \
+            if (surrender_allow and command == '1') \
                 or (add_bet_allow and command == '2') \
                 or (split_allow and command == '3') \
-                or command == '4':
+                or (pass_allow and command == '4'):
                 break
         return command
 
-    def command_2(self):
-        pass
+    def command_2(self, hand_index):
+        hit_allow = self.hands[hand_index].calc_total_value()!= -1 \
+            and self.hands[hand_index].calc_total_value()!= 21\
+            and len(self.hands[hand_index].cards) < 5
+        stop_allow = True
+        while True:
+            command = input(
+                "1.Hit:{0}, 2.Stop:{1}\n".format(
+                    hit_allow, stop_allow
+                )
+            )
+            if (hit_allow and command == '1') \
+                or (stop_allow and command == '2'):
+                break
+        return command
 
     def show_hands(self, check=False):
         for hand_index, hand in enumerate(self.hands):

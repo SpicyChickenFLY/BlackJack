@@ -56,34 +56,43 @@ def game():
             hand_index = 0
             while hand_index < len(players[player_index].hands):
                 print('Player-{0}: '.format(players[player_index].name), end='')
-                command = players[player_index].command_1(hand_index)
-                if command == '1': # surrender
+                '''Initiate Command'''
+                command_1 = players[player_index].command_1(hand_index)
+                if command_1 == '1': # surrender
                     players[player_index].lose()
                     dropped_hand = players[player_index].drop_hand(hand_index)
                     for card in dropped_hand:
                         deck.drop(card)
                     hand_index += 1
                     print('Surrender')
-                elif command == '2': # raise_bet
+                elif command_1 == '2': # raise_bet
                     bet = 5
                     players[player_index].add_bet(bet)
                     print('Raise_bet:{0}'.format(bet))
-                elif command == '3': # split
+                elif command_1 == '3': # split
                     card1 = deck.deal(True)
                     card2 = deck.deal(True)
                     players[player_index].split_hand(hand_index, card1, card2)
                     print('Split')
-                elif command == '4': # pass
+                elif command_1 == '4': # pass
                     hand_index += 1
                     print('Pass')
                 else:
                     print('Do it again')
-                
-            
+
         '''Each player make a decision'''
         for player_index in range(len(players)):
-            pass
-
+            hand_index = 0
+            while hand_index < len(players[player_index].hands):
+                print('Player-{0}: '.format(players[player_index].name), end='')            
+                command_2 = players[player_index].command_2(hand_index)
+                if command_2 == '1': # Hit
+                    players[player_index].deal_hand(hand_index, deck.deal(True))
+                    players[player_index].show_hands(True)
+                elif command_2 == '2': # Stop
+                    hand_index += 1
+                else:
+                    print('Do it again')
         '''Dealer make a decision '''
 
     
