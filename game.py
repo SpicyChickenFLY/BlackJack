@@ -62,6 +62,7 @@ def game():
                     dropped_hand = players[player_index].drop_hand(hand_index)
                     for card in dropped_hand:
                         deck.drop(card)
+                    hand_index += 1
                     print('Surrender')
                 elif command == '2': # raise_bet
                     bet = 5
@@ -80,7 +81,8 @@ def game():
                 
             
         '''Each player make a decision'''
-
+        for player_index in range(len(players)):
+            pass
 
         '''Dealer make a decision '''
 
