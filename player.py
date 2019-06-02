@@ -39,12 +39,12 @@ class Hand:
             else:
                 value += card.value
             if value > 21:
-                return -1
+                return 22
         value += ace_num * 11
         for _ in range(ace_num):
             if value > 21:
                 value -= 10
-        return -1 if value > 21 else value
+        return 22 if value > 21 else value
 
     def show_down(self):
         for card in self.cards:
@@ -58,12 +58,13 @@ class Hand:
         print('')
 
 class Player:  
-    def __init__(self, chips=20, name='player'):
+    def __init__(self, chips=20, name='player', player=True):
         self.hands = [Hand()]
         self.status = []
         self.chips = chips
         self.bets = 0
         self.name = name
+        self.player = player
 
     def split_hand(self, hand_index, card1, card2):
         self.hands[hand_index].show_down()
@@ -115,7 +116,7 @@ class Player:
         return command
 
     def command_2(self, hand_index):
-        hit_allow = self.hands[hand_index].calc_total_value()!= -1 \
+        hit_allow = self.hands[hand_index].calc_total_value()!= 22 \
             and self.hands[hand_index].calc_total_value()!= 21\
             and len(self.hands[hand_index].cards) < 5
         stop_allow = True
