@@ -4,7 +4,7 @@ Create: 2019/05/30
 Last Review: 2019/06/01
 """
 
-from player import Player
+from player import Player_BlackJack, Dealer_BlackJack
 from deck import Deck
 
 def check_player():
@@ -16,8 +16,8 @@ def compare_hands(dealer_hand, player_hand):
 def game():
     '''Check all players and dealer are ready'''
     
-    players = [Player(20, 'Alice'), Player(30, 'Bob'),  Player(30, 'Charlie')]
-    dealer = Player(70, 'Chow', False)
+    players = [Player_BlackJack(20, 'Alice'), Player_BlackJack(30, 'Bob'),  Player_BlackJack(30, 'Charlie')]
+    dealer = Dealer_BlackJack(70, 'Chow', False)
 
     deck = Deck(2)
     deck.show(True)
@@ -61,7 +61,7 @@ def game():
                 command_1 = players[player_index].command_1(hand_index)
                 if command_1 == '1': # surrender
                     print('Surrender')
-                    players[player_index].lose()
+                    players[player_index].lose(hand_index)
                     dropped_hand = players[player_index].drop_hand(hand_index)
                     for card in dropped_hand:
                         deck.drop(card)
@@ -95,8 +95,7 @@ def game():
                     players[player_index].show_hands(True)
                     if players[player_index].hands[hand_index].calc_total_value() == 22:
                         print('Blast')
-                        players[player_index].lose()
-                        dropped_hand = players[player_index].drop_hand(hand_index)
+                        dropped_hand = players[player_index].lose(hand_index)
                         for card in dropped_hand:
                             deck.drop(card)
                         hand_index += 1
@@ -113,7 +112,7 @@ def game():
             dealer.deal_hand(0, deck.deal(True))
         if dealer.hands[0].calc_total_value() == 22:
             dealer.lose()
-        
+
 
 if __name__ == "__main__":
     game()

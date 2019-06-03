@@ -24,6 +24,21 @@ class Hand:
         self.cards = []
         return cards
 
+    def show_down(self):
+        for card in self.cards:
+            if card.face_up:
+                card.flip()
+
+    def show(self, check=False):
+        for card in self.cards:
+            card.show(check)
+            print(' ', end='')
+        print('')
+
+class Hand_BlackJack(Hand):
+    def check_hit_allow(self):
+        pass
+
     def check_split_allow(self):
         return len(self.cards) == 2 and \
             self.cards[0].value == self.cards[1].value
@@ -46,23 +61,9 @@ class Hand:
                 value -= 10
         return 22 if value > 21 else value
 
-    def show_down(self):
-        for card in self.cards:
-            if card.face_up:
-                card.flip()
-
-    def show(self, check=False):
-        for card in self.cards:
-            card.show(check)
-            print(' ', end='')
-        print('')
-
-class Hand_BlackJack(Hand):
-    pass
-
 class Participant:
     def __init__(self, name='player'):
-        self.hands = [Hand()]
+        self.hands = [Hand_BlackJack()]
         self.name = name
 
     def deal_hand(self, hand_index, card):
@@ -102,30 +103,34 @@ class Participant_BlackJack(Participant):
 class Player_BlackJack(Participant_BlackJack):
     def __init__(self, chips=20, name='player'):
         super().__init__(chips, name)
-        self.bets = 0
+        self.bets = [0]
 
-    def add_bet(self, price):
+    def add_bet(self, hand_index, price):
         if self.chips > price:
             self.chips -= price
-            self.bets += price
+            self.bets[hand_index] += price
             return True
         else:
             return False
 
-    def split_hand(self, hand_index, card1, card2):
+    def split_hand(self, hand_index, card1, card2, bet):
         self.hands[hand_index].show_down()
-        self.hands.insert(hand_index + 1, Hand())
+        self.hands.insert(hand_index + 1, Hand_BlackJack())
         split_card = self.hands[hand_index].pop()
         self.deal_hand(hand_index, card1)
         self.hands[hand_index + 1].add(split_card)
         self.deal_hand(hand_index + 1, card2)
 
-    def win(self):
-        self.chips += self.bets
-        self.bets = 0
+    def win(self, hand_index):
+        self.chips += self.bets[hand_index]
+        self.bets[hand_index] = 0
 
-    def lose(self):
-        self.bets = 0
+
+    def lose(self, hand_index):
+        self.bets[hand_index] = 0
+        self.bets.pop(hand_index)
+        dropped_hand = self.drop_hand(hand_index)
+
 
     def initial_command(self, hand_index):
         surrender_allow = True
