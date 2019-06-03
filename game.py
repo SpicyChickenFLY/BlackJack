@@ -17,7 +17,7 @@ def game():
     '''Check all players and dealer are ready'''
     
     players = [Player_BlackJack(20, 'Alice'), Player_BlackJack(30, 'Bob'),  Player_BlackJack(30, 'Charlie')]
-    dealer = Dealer_BlackJack(70, 'Chow', False)
+    dealer = Dealer_BlackJack(70, 'Chow')
 
     deck = Deck(2)
     deck.show(True)
@@ -30,7 +30,7 @@ def game():
 
         '''Every player devide their bet'''
         for player_index in range(len(players)):
-            players[player_index].add_bet(5)
+            players[player_index].raise_bet(5)
             print(
                 'Player-{0} bet {1}\n'.format(
                     players[player_index].name, 
@@ -61,14 +61,13 @@ def game():
                 command_1 = players[player_index].command_1(hand_index)
                 if command_1 == '1': # surrender
                     print('Surrender')
-                    players[player_index].lose(hand_index)
-                    dropped_hand = players[player_index].drop_hand(hand_index)
+                    dropped_hand = players[player_index].lose(hand_index)
                     for card in dropped_hand:
                         deck.drop(card)
                     hand_index += 1
                 elif command_1 == '2': # raise_bet
                     bet = 5
-                    players[player_index].add_bet(bet)
+                    players[player_index].raise_bet(bet)
                     print('Raise_bet:{0}'.format(bet))
                 elif command_1 == '3': # split
                     print('Split')

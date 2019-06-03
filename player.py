@@ -37,7 +37,8 @@ class Hand:
 
 class Hand_BlackJack(Hand):
     def check_hit_allow(self):
-        pass
+        return self.calc_total_value() != 22 \
+            and len(self.cards) < 5
 
     def check_split_allow(self):
         return len(self.cards) == 2 and \
@@ -80,9 +81,7 @@ class Participant_BlackJack(Participant):
         self.chips = chips
 
     def card_command(self, hand_index):
-        hit_allow = self.hands[hand_index].calc_total_value()!= 22 \
-            and self.hands[hand_index].calc_total_value()!= 21\
-            and len(self.hands[hand_index].cards) < 5
+        hit_allow = self.hands[hand_index].check_hit_allow()
         stop_allow = True
         while True:
             command = input(
@@ -105,10 +104,18 @@ class Player_BlackJack(Participant_BlackJack):
         super().__init__(chips, name)
         self.bets = [0]
 
-    def add_bet(self, hand_index, price):
+    def raise_bet(self, hand_index, price):
         if self.chips > price:
             self.chips -= price
             self.bets[hand_index] += price
+            return True
+        else:
+            return False
+
+    def new_bet(self, hand_index, price):
+        if self.chips > price:
+            self.chips -= price
+            self.bets.insert(hand_index, price)
             return True
         else:
             return False
@@ -120,16 +127,19 @@ class Player_BlackJack(Participant_BlackJack):
         self.deal_hand(hand_index, card1)
         self.hands[hand_index + 1].add(split_card)
         self.deal_hand(hand_index + 1, card2)
+        self.new_bet(hand_index + 1, bet)
 
     def win(self, hand_index):
         self.chips += self.bets[hand_index]
-        self.bets[hand_index] = 0
+        self.bets.pop(hand_index)
+        dropped_hand = self.drop_hand(hand_index)
+        return dropped_hand
 
 
     def lose(self, hand_index):
-        self.bets[hand_index] = 0
         self.bets.pop(hand_index)
         dropped_hand = self.drop_hand(hand_index)
+        return dropped_hand
 
 
     def initial_command(self, hand_index):
