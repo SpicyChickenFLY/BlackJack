@@ -113,7 +113,8 @@ def game():
             dealer.deal_hand(0, deck.deal(True))
         if dealer.hands[0].calc_total_value() == 22:
             dealer.lose()
-    
+        
+
 if __name__ == "__main__":
     game()
 

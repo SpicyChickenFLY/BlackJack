@@ -1,7 +1,7 @@
 """
 Author: Chow
 Create: 2019/05/30
-Last Review: 2019/06/01
+Last Review: 2019/06/03
 """
 
 import deck
@@ -16,8 +16,8 @@ class Hand:
         else:
             self.cards.insert(0, card)
         
-    def pop(self):
-        return self.cards.pop()
+    def pop(self, index=-1):
+        return self.cards.pop(index)
 
     def drop(self):
         cards = self.cards
@@ -57,23 +57,14 @@ class Hand:
             print(' ', end='')
         print('')
 
-class Player:  
-    def __init__(self, chips=20, name='player', player=True):
-        self.hands = [Hand()]
-        self.status = []
-        self.chips = chips
-        self.bets = 0
-        self.name = name
-        self.player = player
+class Hand_BlackJack(Hand):
+    pass
 
-    def split_hand(self, hand_index, card1, card2):
-        self.hands[hand_index].show_down()
-        self.hands.insert(hand_index + 1, Hand())
-        split_card = self.hands[hand_index].pop()
-        self.deal_hand(hand_index, card1)
-        self.hands[hand_index + 1].add(split_card)
-        self.deal_hand(hand_index + 1, card2)
-        
+class Participant:
+    def __init__(self, name='player'):
+        self.hands = [Hand()]
+        self.name = name
+
     def deal_hand(self, hand_index, card):
         self.hands[hand_index].add(card)
 
@@ -82,40 +73,12 @@ class Player:
         self.hands.pop(hand_index)
         return cards
 
-    def add_bet(self, price):
-        if self.chips > price:
-            self.chips -= price
-            self.bets += price
-            return True
-        else:
-            return False
-    
-    def win(self):
-        self.chips += self.bets
-        self.bets = 0
+class Participant_BlackJack(Participant):
+    def __init__(self, chips=20, name='player'):
+        super().__init__(name) 
+        self.chips = chips
 
-    def lose(self):
-        self.bets = 0
-
-    def command_1(self, hand_index):
-        surrender_allow = True
-        add_bet_allow = self.chips > 0
-        split_allow = self.hands[hand_index].check_split_allow()
-        pass_allow = True
-        while True:
-            command = input(
-                "1.Surrender:{0}, 2.Raise_bet:{1}, 3:Split:{2}, 4:Pass:{3}\n".format(
-                    surrender_allow, add_bet_allow, split_allow, pass_allow
-                )
-            )
-            if (surrender_allow and command == '1') \
-                or (add_bet_allow and command == '2') \
-                or (split_allow and command == '3') \
-                or (pass_allow and command == '4'):
-                break
-        return command
-
-    def command_2(self, hand_index):
+    def card_command(self, hand_index):
         hit_allow = self.hands[hand_index].calc_total_value()!= 22 \
             and self.hands[hand_index].calc_total_value()!= 21\
             and len(self.hands[hand_index].cards) < 5
@@ -136,8 +99,59 @@ class Player:
             print("hands-{0}: ".format(hand_index), end='')
             hand.show(check)
 
+class Player_BlackJack(Participant_BlackJack):
+    def __init__(self, chips=20, name='player'):
+        super().__init__(chips, name)
+        self.bets = 0
+
+    def add_bet(self, price):
+        if self.chips > price:
+            self.chips -= price
+            self.bets += price
+            return True
+        else:
+            return False
+
+    def split_hand(self, hand_index, card1, card2):
+        self.hands[hand_index].show_down()
+        self.hands.insert(hand_index + 1, Hand())
+        split_card = self.hands[hand_index].pop()
+        self.deal_hand(hand_index, card1)
+        self.hands[hand_index + 1].add(split_card)
+        self.deal_hand(hand_index + 1, card2)
+
+    def win(self):
+        self.chips += self.bets
+        self.bets = 0
+
+    def lose(self):
+        self.bets = 0
+
+    def initial_command(self, hand_index):
+        surrender_allow = True
+        add_bet_allow = self.chips > 0
+        split_allow = self.hands[hand_index].check_split_allow()
+        pass_allow = True
+        while True:
+            command = input(
+                "1.Surrender:{0}, 2.Raise_bet:{1}, 3:Split:{2}, 4:Pass:{3}\n".format(
+                    surrender_allow, add_bet_allow, split_allow, pass_allow
+                )
+            )
+            if (surrender_allow and command == '1') \
+                or (add_bet_allow and command == '2') \
+                or (split_allow and command == '3') \
+                or (pass_allow and command == '4'):
+                break
+        return command
+
+class Dealer_BlackJack(Participant_BlackJack):
+    def __init__(self, chips=20, name='player'):
+        super().__init__(chips, name) 
+    
+
 if __name__ == "__main__":
-    dealer = Player(40)
+    dealer = Dealer_BlackJack(40, 'Chow')
     dealer.deal_hand(0, deck.Card(12, 'spade'))
     dealer.deal_hand(0, deck.Card(1, 'spade', True))
     dealer.deal_hand(0, deck.Card(2, 'heart', True))
