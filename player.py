@@ -1,7 +1,7 @@
 """
 Author: Chow
 Create: 2019/05/30
-Last Review: 2019/06/03
+Last Review: 2019/06/04
 """
 
 import deck
@@ -64,7 +64,7 @@ class Hand_BlackJack(Hand):
 
 class Participant:
     def __init__(self, name='player'):
-        self.hands = [Hand_BlackJack()]
+        self.hands = []
         self.name = name
 
     def deal_hand(self, hand_index, card):
@@ -78,6 +78,7 @@ class Participant:
 class Participant_BlackJack(Participant):
     def __init__(self, chips=20, name='player'):
         super().__init__(name) 
+        self.bets = []
         self.chips = chips
 
     def card_command(self, hand_index):
@@ -102,7 +103,11 @@ class Participant_BlackJack(Participant):
 class Player_BlackJack(Participant_BlackJack):
     def __init__(self, chips=20, name='player'):
         super().__init__(chips, name)
-        self.bets = [0]
+        self.join_game(5)
+        
+    def join_game(self, price):
+        if self.new_bet(0, price):
+            self.hands.insert(0, Hand_BlackJack())
 
     def raise_bet(self, hand_index, price):
         if self.chips > price:
@@ -131,16 +136,14 @@ class Player_BlackJack(Participant_BlackJack):
 
     def win(self, hand_index):
         self.chips += self.bets[hand_index]
-        self.bets.pop(hand_index)
+        bet = self.bets.pop(hand_index)
         dropped_hand = self.drop_hand(hand_index)
-        return dropped_hand
-
+        return dropped_hand, bet
 
     def lose(self, hand_index):
-        self.bets.pop(hand_index)
+        bet = self.bets.pop(hand_index)
         dropped_hand = self.drop_hand(hand_index)
-        return dropped_hand
-
+        return dropped_hand, bet
 
     def initial_command(self, hand_index):
         surrender_allow = True
@@ -163,7 +166,21 @@ class Player_BlackJack(Participant_BlackJack):
 class Dealer_BlackJack(Participant_BlackJack):
     def __init__(self, chips=20, name='player'):
         super().__init__(chips, name) 
-    
+        self.hold_game()
+
+    def hold_game(self):
+        self.hands.insert(0, Hand_BlackJack())
+
+    def win(self, bet):
+        self.chips += bet
+        dropped_hand = self.drop_hand(0)
+        return dropped_hand
+
+    def lose(self, bet):
+        self.chips -= bet
+        dropped_hand = self.drop_hand(0)
+        return dropped_hand
+
 
 if __name__ == "__main__":
     dealer = Dealer_BlackJack(40, 'Chow')

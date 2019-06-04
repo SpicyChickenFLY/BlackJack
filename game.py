@@ -61,7 +61,10 @@ def game():
                 command_1 = players[player_index].command_1(hand_index)
                 if command_1 == '1': # surrender
                     print('Surrender')
-                    dropped_hand = players[player_index].lose(hand_index)
+                    dropped_hand, bet = players[player_index].lose(hand_index)
+                    for card in dropped_hand:
+                        deck.drop(card)
+                    dropped_hand = dealer.win(bet)
                     for card in dropped_hand:
                         deck.drop(card)
                     hand_index += 1
@@ -94,7 +97,10 @@ def game():
                     players[player_index].show_hands(True)
                     if players[player_index].hands[hand_index].calc_total_value() == 22:
                         print('Blast')
-                        dropped_hand = players[player_index].lose(hand_index)
+                        dropped_hand, bet = players[player_index].lose(hand_index)
+                        for card in dropped_hand:
+                            deck.drop(card)
+                        dropped_hand = dealer.win(bet)
                         for card in dropped_hand:
                             deck.drop(card)
                         hand_index += 1
@@ -110,7 +116,14 @@ def game():
         while dealer.hands[0].calc_total_value() < 17:
             dealer.deal_hand(0, deck.deal(True))
         if dealer.hands[0].calc_total_value() == 22:
-            dealer.lose()
+            for player_index in range(len(players)):
+                for hand_index in range(len(players[player_index].hands)):
+                    dropped_hand, bet = players[player_index].win(hand_index)
+                    for card in dropped_hand:
+                        deck.drop(card)
+                    dropped_hand = dealer.lose(bet)
+                    for card in dropped_hand:
+                        deck.drop(card)
 
 
 if __name__ == "__main__":
