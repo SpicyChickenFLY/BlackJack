@@ -97,7 +97,7 @@ class Participant_BlackJack(Participant):
 
     def show_hands(self, check=False):
         for hand_index, hand in enumerate(self.hands):
-            print("hands-{0}: ".format(hand_index), end='')
+            print("hands-{0} bet-{1}: ".format(hand_index, self.bets[hand_index]), end='')
             hand.show(check)
 
 class Player_BlackJack(Participant_BlackJack):
@@ -110,12 +110,9 @@ class Player_BlackJack(Participant_BlackJack):
             self.hands.insert(0, Hand_BlackJack())
 
     def raise_bet(self, hand_index, price):
-        if self.chips > price:
+        if self.chips >= price:
             self.chips -= price
             self.bets[hand_index] += price
-            return True
-        else:
-            return False
 
     def new_bet(self, hand_index, price):
         if self.chips > price:
@@ -169,17 +166,14 @@ class Dealer_BlackJack(Participant_BlackJack):
         self.hold_game()
 
     def hold_game(self):
+        self.bets.insert(0, 0)
         self.hands.insert(0, Hand_BlackJack())
 
     def win(self, bet):
         self.chips += bet
-        dropped_hand = self.drop_hand(0)
-        return dropped_hand
 
     def lose(self, bet):
         self.chips -= bet
-        dropped_hand = self.drop_hand(0)
-        return dropped_hand
 
 
 if __name__ == "__main__":

@@ -7,36 +7,27 @@ Last Review: 2019/06/01
 from player import Player_BlackJack, Dealer_BlackJack
 from deck import Deck
 
-def check_player():
-    pass
-
-def compare_hands(dealer_hand, player_hand):
-    pass
 
 def game():
     '''Check all players and dealer are ready'''
     
     players = [Player_BlackJack(20, 'Alice'), Player_BlackJack(30, 'Bob'),  Player_BlackJack(30, 'Charlie')]
     dealer = Dealer_BlackJack(70, 'Chow')
+    score_board = []
 
     deck = Deck(2)
-    deck.show(True)
+    #deck.show(True)
 
     round_num = 0
     if True:
         '''New round'''
         round_num += 1
+        score = []
+        for _ in range(len(players)):
+            score.append(0)
+        score.append(0)
         print('Round: {0}'.format(round_num))
 
-        '''Every player devide their bet'''
-        for player_index in range(len(players)):
-            players[player_index].raise_bet(5)
-            print(
-                'Player-{0} bet {1}\n'.format(
-                    players[player_index].name, 
-                    players[player_index].bets
-                )
-            )
         print("Game Start")
 
         '''Deal card for dealer and each player'''
@@ -58,27 +49,29 @@ def game():
                 print('Player-{0}: '.format(players[player_index].name))
                 players[player_index].show_hands(True)
                 '''Initiate Command'''
-                command_1 = players[player_index].command_1(hand_index)
-                if command_1 == '1': # surrender
+                command = players[player_index].initial_command(hand_index)
+                if command == '1': # surrender
                     print('Surrender')
                     dropped_hand, bet = players[player_index].lose(hand_index)
+                    score[player_index] -= bet
                     for card in dropped_hand:
                         deck.drop(card)
                     dropped_hand = dealer.win(bet)
+                    score[-1] += bet
                     for card in dropped_hand:
                         deck.drop(card)
                     hand_index += 1
-                elif command_1 == '2': # raise_bet
+                elif command == '2': # raise_bet
                     bet = 5
-                    players[player_index].raise_bet(bet)
+                    players[player_index].raise_bet(hand_index, bet)
                     print('Raise_bet:{0}'.format(bet))
-                elif command_1 == '3': # split
+                elif command == '3': # split
                     print('Split')
                     card1 = deck.deal(True)
                     card2 = deck.deal(True)
                     players[player_index].split_hand(hand_index, card1, card2)
 
-                elif command_1 == '4': # pass
+                elif command == '4': # pass
                     print('Pass')
                     hand_index += 1
                 else:
@@ -90,22 +83,22 @@ def game():
             while hand_index < len(players[player_index].hands):
                 print('Player-{0}: '.format(players[player_index].name))
                 players[player_index].show_hands(True)            
-                command_2 = players[player_index].command_2(hand_index)
-                if command_2 == '1': # Hit
+                command = players[player_index].card_command(hand_index)
+                if command == '1': # Hit
                     print('Hit')
                     players[player_index].deal_hand(hand_index, deck.deal(True))
                     players[player_index].show_hands(True)
                     if players[player_index].hands[hand_index].calc_total_value() == 22:
                         print('Blast')
                         dropped_hand, bet = players[player_index].lose(hand_index)
+                        score[player_index] -= bet
                         for card in dropped_hand:
                             deck.drop(card)
-                        dropped_hand = dealer.win(bet)
-                        for card in dropped_hand:
-                            deck.drop(card)
+                        dealer.win(bet)
+                        score[-1] += bet
                         hand_index += 1
                         
-                elif command_2 == '2': # Stop
+                elif command == '2': # Stop
                     print('Stop')
                     hand_index += 1
                     
@@ -113,18 +106,72 @@ def game():
                     print('Do it again')
 
         '''Dealer make a decision '''
+        print('Dealer-{0}: '.format(dealer.name))
         while dealer.hands[0].calc_total_value() < 17:
             dealer.deal_hand(0, deck.deal(True))
+            print('Supply')
+            dealer.show_hands(True)
         if dealer.hands[0].calc_total_value() == 22:
+            print('Blast')
             for player_index in range(len(players)):
                 for hand_index in range(len(players[player_index].hands)):
                     dropped_hand, bet = players[player_index].win(hand_index)
+                    score[player_index] += bet
                     for card in dropped_hand:
                         deck.drop(card)
-                    dropped_hand = dealer.lose(bet)
-                    for card in dropped_hand:
-                        deck.drop(card)
+                    dealer.lose(bet)
+                    score[-1] -= bet
+            dropped_hand = dealer.drop_hand(0)
+            for card in dropped_hand:
+                deck.drop(card)
+        else:
+            while True:
+                command = dealer.card_command(0)
+                if command == '1': # Hit
+                    print('Hit')
+                    dealer.deal_hand(0, deck.deal(True))
+                    dealer.show_hands(True)
+                    if dealer.hands[0].calc_total_value() == 22:
+                        print('Blast')
+                        for player_index in range(len(players)):
+                            for hand_index in range(len(players[player_index].hands)):
+                                dropped_hand, bet = players[player_index].win(hand_index)
+                                scorep[player_index] += bet
+                                for card in dropped_hand:
+                                    deck.drop(card)
+                                dealer.lose(bet)
+                                score[-1] -= bet
+                        dealer.drop_hand(0)
+                        for card in dropped_hand:
+                            deck.drop(card)
+                        break
+                elif command == '2': # Stop
+                    print('Stop')
+                    break
+                else:
+                    print('Do it again')
 
+        '''judgement'''
+        for player_index in range(len(players)):
+            for hand_index in range(len(players[player_index].hands)):
+                player_hand_value = players[player_index].hands[hand_index].calc_total_value()
+                dealer_hand_value = dealer.hands[0].calc_total_value()
+                if player_hand_value > dealer_hand_value:
+                    pass
+                elif player_hand_value < dealer_hand_value:
+                    pass
+                else:
+                    player_hand_len = len(players[player_index].hands[hand_index].cards)
+                    dealer_hand_len = len(dealer.hands[0].cards)
+                    if player_hand_len > dealer_hand_len:
+                        pass
+                    elif player_hand_len < dealer_hand_len:
+                        pass
+                    else:
+                        pass
+
+        print(score)
+        
 
 if __name__ == "__main__":
     game()

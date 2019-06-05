@@ -10,6 +10,9 @@ class TestDeckFunctions(unittest.TestCase):
     def test_card_init(self):
         pass
 
+    def test_deck_init(self):
+        pass
+
 class TestPlayerFunction(unittest.TestCase):
     def test_player_init(self):
         pass
