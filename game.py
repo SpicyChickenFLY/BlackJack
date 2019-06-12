@@ -1,12 +1,36 @@
 """
 Author: Chow
 Create: 2019/05/30
-Last Review: 2019/06/01
+Last Review: 2019/06/12
 """
 
 from player import Player_BlackJack, Dealer_BlackJack
 from deck import Deck
 
+class Game():
+    def __init__(self):
+        self.round_num = 0
+        self.player = []
+        self.dealer = None
+        self.score_board = []
+        self.deck = None
+    
+    def new_player_connect(self):
+        """
+        Params:
+        Returns:
+        Raises:
+        """
+        pass
+
+    def player_disconnect(self):
+        pass
+
+    def dealer_disconnect(self):
+        pass
+
+    def new_round(self):
+        pass
 
 def game():
     '''Check all players and dealer are ready'''
