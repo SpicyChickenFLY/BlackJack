@@ -1,13 +1,20 @@
 """
 Author: Chow
 Create: 2019/05/30
-Last Review: 2019/06/04
+Last Review: 2019/06/13
 """
 
 from hand import Hand_BlackJack
 
-class Participant:
+
+
+class Spectator:
+    def __init__(self, addr):
+        self.addr = addr
+
+class Participant(Spectator):
     def __init__(self, name='player'):
+        super().__init__(addr) 
         self.hands = []
         self.name = name
 
@@ -34,6 +41,7 @@ class Participant_BlackJack(Participant):
                     hit_allow, stop_allow
                 )
             )
+            # default 2
             if (hit_allow and command == '1') \
                 or (stop_allow and command == '2'):
                 break
@@ -97,6 +105,7 @@ class Player_BlackJack(Participant_BlackJack):
                     surrender_allow, add_bet_allow, split_allow, pass_allow
                 )
             )
+            # default 4
             if (surrender_allow and command == '1') \
                 or (add_bet_allow and command == '2') \
                 or (split_allow and command == '3') \
