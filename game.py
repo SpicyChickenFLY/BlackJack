@@ -29,8 +29,21 @@ class Game():
     def dealer_disconnect(self):
         pass
 
-    def new_round(self):
+    def check_player_num(self):
         pass
+
+    def new_round(self):
+        self.round_num += 1
+        self.deck = Deck(2)
+        
+        score = []
+        for _ in range(self.check_player_num()):
+            score.append(0)
+        print('Round: {0}'.format(self.round_num))
+        '''Initial Phase'''
+        '''Player Decision Phase'''
+        '''Dealer Decesion Phase'''
+        '''Resolution Phase'''
 
 def game():
     '''Check all players and dealer are ready'''
