@@ -8,13 +8,8 @@ from hand import Hand_BlackJack
 
 
 
-class Spectator:
-    def __init__(self, addr):
-        self.addr = addr
-
-class Participant(Spectator):
-    def __init__(self, name='player'):
-        super().__init__(addr) 
+class Participant():
+    def __init__(self, name='player'): 
         self.hands = []
         self.name = name
 
@@ -87,7 +82,7 @@ class Player_BlackJack(Participant_BlackJack):
         self.chips += self.bets[hand_index]
         bet = self.bets.pop(hand_index)
         dropped_hand = self.drop_hand(hand_index)
-        return dropped_hand, bet
+        return dropped_hand
 
     def lose(self, hand_index):
         bet = self.bets.pop(hand_index)
@@ -124,10 +119,13 @@ class Dealer_BlackJack(Participant_BlackJack):
 
     def win(self, bet):
         self.chips += bet
+        dropped_hand = self.drop_hand(0)
+        return dropped_hand
 
     def lose(self, bet):
         self.chips -= bet
-
+        dropped_hand = self.drop_hand(hand_index)
+        return dropped_hand, bet
 
 if __name__ == "__main__":
     from deck import Card
