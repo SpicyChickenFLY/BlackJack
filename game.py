@@ -10,7 +10,7 @@ from deck import Deck
 class Game():
     def __init__(self):
         self.round_num = 0
-        self.player = []
+        self.players = []
         self.dealer = None
         self.score_board = []
         self.deck = None
@@ -32,6 +32,9 @@ class Game():
     def check_player_num(self):
         pass
 
+    def showScoreBoard(self):
+        pass
+
     def new_round(self):
         self.round_num += 1
         self.deck = Deck(2)
@@ -41,9 +44,22 @@ class Game():
             score.append(0)
         print('Round: {0}'.format(self.round_num))
         '''Initial Phase'''
-        '''Player Decision Phase'''
-        '''Dealer Decesion Phase'''
-        '''Resolution Phase'''
+        for player_index in range(len(self.players)):
+            self.players[player_index].deal_hand(0, deck.deal(True))
+            self.players[player_index].deal_hand(0, deck.deal())
+            print('Player-{0}: '.format(self.players[player_index].name))
+            self.players[player_index].show_hands(True)
+        self.dealer.deal_hand(0, deck.deal(True))         
+        self.dealer.deal_hand(0, deck.deal())
+        print('Dealer-{0}: '.format(self.dealer.name))
+        self.dealer.show_hands(True)
+        print()
+        '''Player Phase-1'''
+        
+        '''Player Phase-2'''
+        '''Dealer Phase'''
+        '''Judge Phase'''
+        '''End Phase'''
 
 def game():
     '''Check all players and dealer are ready'''
@@ -93,15 +109,14 @@ def game():
                     score[player_index] -= bet
                     for card in dropped_hand:
                         deck.drop(card)
-                    dropped_hand = dealer.win(bet)
+                    dealer.win(bet)
                     score[-1] += bet
-                    for card in dropped_hand:
-                        deck.drop(card)
-                    hand_index += 1
+
                 elif command == '2': # raise_bet
                     bet = 5
                     players[player_index].raise_bet(hand_index, bet)
                     print('Raise_bet:{0}'.format(bet))
+
                 elif command == '3': # split
                     print('Split')
                     card1 = deck.deal(True)
@@ -158,9 +173,6 @@ def game():
                         deck.drop(card)
                     dealer.lose(bet)
                     score[-1] -= bet
-            dropped_hand = dealer.drop_hand(0)
-            for card in dropped_hand:
-                deck.drop(card)
         else:
             while True:
                 command = dealer.card_command(0)
@@ -173,14 +185,11 @@ def game():
                         for player_index in range(len(players)):
                             for hand_index in range(len(players[player_index].hands)):
                                 dropped_hand, bet = players[player_index].win(hand_index)
-                                scorep[player_index] += bet
+                                score[player_index] += bet
                                 for card in dropped_hand:
                                     deck.drop(card)
                                 dealer.lose(bet)
                                 score[-1] -= bet
-                        dealer.drop_hand(0)
-                        for card in dropped_hand:
-                            deck.drop(card)
                         break
                 elif command == '2': # Stop
                     print('Stop')
@@ -188,13 +197,18 @@ def game():
                 else:
                     print('Do it again')
 
-        '''judgement'''
+        '''Judge Phase'''
         for player_index in range(len(players)):
             for hand_index in range(len(players[player_index].hands)):
                 player_hand_value = players[player_index].hands[hand_index].calc_total_value()
                 dealer_hand_value = dealer.hands[0].calc_total_value()
                 if player_hand_value > dealer_hand_value:
-                    pass
+                    dropped_hand, bet = players[player_index].win(hand_index)
+                    score[player_index] += bet
+                    for card in dropped_hand:
+                        deck.drop(card)
+                    dealer.lose(bet)
+                    score[-1] -= bet
                 elif player_hand_value < dealer_hand_value:
                     pass
                 else:
@@ -207,7 +221,13 @@ def game():
                     else:
                         pass
 
+        '''End Phase'''
+        dropped_hand = dealer.drop_hand(0)
+        for card in dropped_hand:
+            deck.drop(card)
+
         print(score)
+        self.score_board.append(score)
         
 
 if __name__ == "__main__":

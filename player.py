@@ -82,7 +82,7 @@ class Player_BlackJack(Participant_BlackJack):
         self.chips += self.bets[hand_index]
         bet = self.bets.pop(hand_index)
         dropped_hand = self.drop_hand(hand_index)
-        return dropped_hand
+        return dropped_hand, bet
 
     def lose(self, hand_index):
         bet = self.bets.pop(hand_index)
@@ -119,13 +119,10 @@ class Dealer_BlackJack(Participant_BlackJack):
 
     def win(self, bet):
         self.chips += bet
-        dropped_hand = self.drop_hand(0)
-        return dropped_hand
 
     def lose(self, bet):
         self.chips -= bet
-        dropped_hand = self.drop_hand(hand_index)
-        return dropped_hand, bet
+
 
 if __name__ == "__main__":
     from deck import Card
