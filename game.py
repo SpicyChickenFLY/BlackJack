@@ -7,24 +7,8 @@ Last Review: 2019/06/18
 from player import Player_BlackJack, Dealer_BlackJack
 from deck import Deck
 
-
-class PlayerManager():
-    def __init__(self):
-        pass
-    def new_player_connect(self):
-        pass
-
-    def player_disconnect(self):
-        pass
-
-    def dealer_disconnect(self):
-        pass
-
-    def check_player_num(self):
-        pass
-
 class GameManager():
-    def __init__(self):
+    def __init__(self, message_queue):
         self.round_num = 0
         self.round_score = []
         self.players = []
@@ -57,7 +41,7 @@ class GameManager():
         self.deck = Deck(2)
         
         score = []
-        for _ in range(self.check_player_num()):
+        for _ in range(len(players)):
             score.append(0)
 
         print('Round: {0}'.format(self.round_num))
@@ -65,12 +49,12 @@ class GameManager():
         '''Initial Phase'''
         print("--- Initial Phase ---")
         for player_index in range(len(self.players)):
-            self.players[player_index].deal_hand(0, deck.deal(True))
-            self.players[player_index].deal_hand(0, deck.deal())
+            self.players[player_index].deal_hand(0, self.deck.deal(True))
+            self.players[player_index].deal_hand(0, self.deck.deal())
             print('Player-{0}: '.format(self.players[player_index].name))
             self.players[player_index].show_hands(True)
-        self.dealer.deal_hand(0, deck.deal(True))         
-        self.dealer.deal_hand(0, deck.deal())
+        self.dealer.deal_hand(0, self.deck.deal(True))         
+        self.dealer.deal_hand(0, self.deck.deal())
         print('Dealer-{0}: '.format(self.dealer.name))
         self.dealer.show_hands(True)
 
@@ -92,8 +76,8 @@ class GameManager():
                     print('Raise_bet:{0}'.format(bet))
                 elif command == '3': # split
                     print('Split')
-                    card1 = deck.deal(True)
-                    card2 = deck.deal(True)
+                    card1 = self.deck.deal(True)
+                    card2 = self.deck.deal(True)
                     players[player_index].split_hand(hand_index, card1, card2)
                 elif command == '4': # pass
                     print('Pass')
@@ -111,7 +95,7 @@ class GameManager():
                 command = players[player_index].card_command(hand_index)
                 if command == '1': # Hit
                     print('Hit')
-                    players[player_index].deal_hand(hand_index, deck.deal(True))
+                    players[player_index].deal_hand(hand_index, self.deck.deal(True))
                     players[player_index].show_hands(True)
                     if players[player_index].hands[hand_index].calc_total_value() == 22:
                         print('Blast')
@@ -128,7 +112,7 @@ class GameManager():
         print("--- Dealer Phase ---")
         print('Dealer-{0}: '.format(dealer.name))
         while dealer.hands[0].calc_total_value() < 17:
-            dealer.deal_hand(0, deck.deal(True))
+            dealer.deal_hand(0, self.deck.deal(True))
             print('Supply')
             dealer.show_hands(True)
         if dealer.hands[0].calc_total_value() == 22:
@@ -138,7 +122,7 @@ class GameManager():
                     dropped_hand, bet = players[player_index].win(hand_index)
                     score[player_index] += bet
                     for card in dropped_hand:
-                        deck.drop(card)
+                        self.deck.drop(card)
                     dealer.lose(bet)
                     score[-1] -= bet
         else:
@@ -146,7 +130,7 @@ class GameManager():
                 command = dealer.card_command(0)
                 if command == '1': # Hit
                     print('Hit')
-                    dealer.deal_hand(0, deck.deal(True))
+                    dealer.deal_hand(0, self.deck.deal(True))
                     dealer.show_hands(True)
                     if dealer.hands[0].calc_total_value() == 22:
                         print('Blast')
@@ -155,7 +139,7 @@ class GameManager():
                                 dropped_hand, bet = players[player_index].win(hand_index)
                                 score[player_index] += bet
                                 for card in dropped_hand:
-                                    deck.drop(card)
+                                    self.deck.drop(card)
                                 dealer.lose(bet)
                                 score[-1] -= bet
                         break
@@ -175,7 +159,7 @@ class GameManager():
                     dropped_hand, bet = players[player_index].win(hand_index)
                     score[player_index] += bet
                     for card in dropped_hand:
-                        deck.drop(card)
+                        self.deck.drop(card)
                     dealer.lose(bet)
                     score[-1] -= bet
                 elif player_hand_value < dealer_hand_value:
@@ -194,7 +178,7 @@ class GameManager():
         print("--- End Phase ---")
         dropped_hand = dealer.drop_hand(0)
         for card in dropped_hand:
-            deck.drop(card)
+            self.deck.drop(card)
         print(score)
         score_board.append(score)
 
@@ -205,8 +189,8 @@ def game():
     dealer = Dealer_BlackJack(70, 'Chow')
     score_board = []
 
-    deck = Deck(2)
-    #deck.show(True)
+    self.deck = Deck(2)
+    #self.deck.show(True)
 
     
         

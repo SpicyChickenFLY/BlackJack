@@ -6,7 +6,7 @@ Last Review: 2019/06/01
 
 import random
 
-SUITS = ['spade', 'club', 'heart', 'diamond']
+SUITS = ['spade', 'club', 'heart', 'diamond', 'none']
 
 class Deck:
     def __init__(self, duplicate=1, size='no_joker'): 
@@ -67,7 +67,7 @@ class Card:
         value: 1~15
         suit: spade, club, heart, diamond, None
         """
-        self.value = value
+        self.value = value 
         self.suit = suit
         self.face_up = face_up
 
