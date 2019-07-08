@@ -8,7 +8,7 @@ from game import GameManager
 """
 The format of standard message:
 {
-    "type": connect/pulse/disconnect/command/load/chat/info/warn/sys,
+    "type": pulse/connect/disconnect/command/load/chat/info/warn/sys,
     "content": 
 }
 The content will be different
@@ -24,6 +24,7 @@ class System():
     def __init__(self):
         self.receive_queue = Queue()
         self.send_queue = Queue()
+        self.server_pipe, self.game_pipe = Pipe()
         self.clients = []
         self.server = ServerUDP()
         self.game_manager = GameManager()
@@ -56,17 +57,24 @@ class System():
                 message = self.receive_queue.get(True)
                 addr = message[0]
                 data = message[1]
-                if data["type"] == "connect" or data["type"] == "disconnect" :
-                    # new client connected
+                response_data = {
+                    "type": data["type"],
+                    "content": ""
+                }
+                if data["type"] == "connect" or data["type"] == "disconnect":  # new client connected
                     self.clients.append(addr)
-                    response_data = {
-                        "type": data["type"],
-                        "content": ""
-                    }
-                    self.send_queue.put([addr, data])
-                if data["type"] == "command":
-                    # client make command
+                if data["type"] == "command":  # client make command
+                    try:
+                        self.server_pipe.send(int(data["content"]))
+                        response_data["content"] = "success"
+                    except Exception as e:
+                        response_data["content"] = "fail"           
+                if data["type"] == "load": # client ask for a copy of game
+                    self.server_pipe.send()
+                    self.server_pipe.receive()
+                if data["type"] == "chat":  # client ask for a copy of game
                     pass
+                self.send_queue.put([addr, response_data])
                 
 
     def receive_func(self):
