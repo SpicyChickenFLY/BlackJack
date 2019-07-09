@@ -23,7 +23,13 @@ class TestDeckFunctions(unittest.TestCase):
         card.show()
 
     def test_deck_init(self):
-        pass
+        deck = Deck()
+        card = deck.deal()
+        card.show()
+        card = deck.deal(True)
+        card.show()
+        deck.show()
+        
 
 class TestPlayerFunction(unittest.TestCase):
     def test_player_init(self):

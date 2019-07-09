@@ -8,7 +8,7 @@ from game import GameManager
 """
 The format of standard message:
 {
-    "type": pulse/connect/disconnect/command/load/chat/info/warn/sys,
+    "type": pulse/connect/disconnect/command/load/chat; info/warn/sys,
     "content": 
 }
 The content will be different
@@ -33,6 +33,7 @@ class System():
         self.send_process = None
 
     def startup(self):
+        self.server.host('127.0.0.1', 23333)
         self.message_process = Process(
             target=self.message_func, args=())
         self.receive_process = Process(
@@ -44,6 +45,7 @@ class System():
         self.send_process.start()
 
     def shutdown(self):
+        self.server.stop()
         if self.message_process != None:
             self.message_process.terminate()
         if self.receive_process != None:
@@ -64,15 +66,10 @@ class System():
                 if data["type"] == "connect" or data["type"] == "disconnect":  # new client connected
                     self.clients.append(addr)
                 if data["type"] == "command":  # client make command
-                    try:
-                        self.server_pipe.send(int(data["content"]))
-                        response_data["content"] = "success"
-                    except Exception as e:
-                        response_data["content"] = "fail"           
+                    self.server_pipe.send(data)
                 if data["type"] == "load": # client ask for a copy of game
                     self.server_pipe.send()
-                    self.server_pipe.receive()
-                if data["type"] == "chat":  # client ask for a copy of game
+                if data["type"] == "chat":  # broadcast chat message
                     pass
                 self.send_queue.put([addr, response_data])
                 

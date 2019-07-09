@@ -15,10 +15,13 @@ class ServerUDP:
         self.new_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
     def __del__(self):
-        self.new_socket.close()
+        self.stop()
 
     def host(self, host, port):
         self.new_socket.bind((host, port))
+
+    def stop(self):
+        self.new_socket.close()
 
     def receive(self):
         data, addr = self.new_socket.recvfrom(1024)
@@ -36,16 +39,22 @@ class ClientUDP:
         self.new_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
     def __del__(self):
-        self.new_socket.close()
+        self.disconnect()
 
     def connect(self, host, port):
         self.new_socket.connect((host, port))
     
-    def send(self, message):
-        self.new_socket.send(message)
+    def disconnect(self):
+        self.new_socket.close()
+
+    def send(self, data):
+        print('Request data to Server: {0}'.format(data))
+        self.new_socket.send(data)
 
     def receive(self):
-        return self.new_socket.recv(1024)
+        data =  self.new_socket.recv(1024)
+        print('Request data from Server: {0}'.format(data))
+        return data
 
 if __name__ == "__main__":
     if  len(sys.argv) > 1 and sys.argv[1] == 'client':
